@@ -82,3 +82,4 @@ docker-kafka.yml
 - ./kafka-console-consumer --bootstrap-server localhost:19092 --topic cluster (메시지 받기)
 
 -./kafka-topics --describe --bootstrap-server localhost:19092 --topic cluster (topic 확인)
+- Isr: 리더와 팔로우의 모음
