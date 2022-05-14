@@ -1,0 +1,84 @@
+### docker 설치
+### docker 작동 확인
+- docker run hello-world
+
+### 간단한 wordpress와 mysql 컨테이너 설치
+- vi docker-wordpress.yml (sql 컨테이너와 wordpress컨테이너 설치 파일)
+
+docker-wordpress.yml
+      version: "3"
+      services:
+        mysql_database:
+          image: mysql:5.7
+          environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: wordpress_db
+            MYSQL_USER: wordpress_user
+            MYSQL_PASSWORD: changeme!
+          volumes:
+            - ./mysql:/var/lib/mysql
+
+        wordpress:
+          depends_on:
+            - mysql_database
+          image: wordpress:5.8.1
+          ports:
+            - "8080:80"
+          environment:
+            WORDPRESS_DB_HOST: mysql_database:3306
+            WORDPRESS_DB_USER: wordpress_user
+            WORDPRESS_DB_PASSWORD: changeme!
+            WORDPRESS_DB_NAME: wordpress_db
+          volumes:
+            - ./wordpress_html:/var/www/html
+
+- docker compose -f docker-compose-wordpress.yml up (yml 파일 실행하여 docker 컨테이너 설치)
+- localhost:8080으로 접속 --> wordpress 설정 
+
+### DOCKER KAFKA 컨테이너 실행
+- vi docker-kafka.yml (sql 컨테이너와 wordpress컨테이너 설치 파일)
+ 
+docker-kafka.yml
+    version: '3'
+    services:
+      zookeeper:
+        hostname: zookeeper
+        image: confluentinc/cp-zookeeper:6.2.0
+        environment:
+          ZOOKEEPER_SERVER_ID: 1
+          ZOOKEEPER_CLIENT_PORT: 12181
+          ZOOKEEPER_DATA_DIR: /zookeeper/data
+          ZOOKEEPER_SERVERS: zookeeper:22888:23888
+        ports:
+          - 12181:12181
+          - 22888:22888
+        volumes:
+          - ./zookeeper/data/1:/zookeeper/data
+
+      kafka:
+        image: confluentinc/cp-kafka:6.2.0
+        hostname: kafka
+        depends_on:
+          - zookeeper
+        environment:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:12181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092
+          KAFKA_LOG_DIRS: /kafka
+        ports:
+          - 19092:19092
+        volumes:
+          - ./kafka/logs/1:/kafka
+
+- docker compose -f ./docker-compose-confluent-cluster.yml up
+
+### kafka 사이트 들어가서 community에서 사용할 커맨드 설치
+- tar -xvf confluent-6.2.1(다운로드 받은 파일을 압축풀기)
+- cd confluent-6.2.1
+- cd bin
+- ./kafka-topics --bootstrap-server localhost:19092 --create --topic cluster --partitions 2 --replication-factor 3 (topic 생성)
+### 동작확인
+- ./kafka-console-producer --bootstrap-server localhost:19092 --topic cluster (메시지 입력)
+- ./kafka-console-consumer --bootstrap-server localhost:19092 --topic cluster (메시지 받기)
+
+-./kafka-topics --describe --bootstrap-server localhost:19092 --topic cluster (topic 확인)
