@@ -32,6 +32,10 @@
 - docker run --rm : 컨테이너 실행 종료 후 자동 삭제
 - docker container prune : 중지된 모든 컨테이너 삭제
 
+###엔트리 포인트
+ex) docker run --entrypoint sh ubuntu:focal
+ex) docker run --entrypoint echo ubuntu:focal hello world
+
 
 ### docker 작동 확인
 - docker run hello-world
