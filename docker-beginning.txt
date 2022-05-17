@@ -110,6 +110,8 @@ docker-kafka.yml
 
 - docker compose -f ./docker-compose-confluent-cluster.yml up
 
+
+### docker  error 가 발생햐서 계속 container 멈춤
 ### kafka 사이트 들어가서 community에서 사용할 커맨드 설치
 - tar -xvf confluent-6.2.1(다운로드 받은 파일을 압축풀기)
 - cd confluent-6.2.1
